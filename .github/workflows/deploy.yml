@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: https://megakem-buildcare.onrender.com
+          VITE_API_URL: https://megakem-buildcare-backend.onrender.com
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
