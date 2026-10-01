@@ -54,7 +54,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Toaster position="top-center" richColors expand={false} />
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/admin" element={<AdminDashboard />} />
