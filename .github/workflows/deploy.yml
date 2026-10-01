@@ -1,6 +1,11 @@
 name: Deploy Frontend
 
-on: [push]
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy:
@@ -22,7 +27,7 @@ jobs:
         env:
           VITE_API_URL: https://megakem-buildcare-backend.onrender.com
 
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
