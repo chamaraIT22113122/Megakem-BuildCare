@@ -18,7 +18,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        run: npx vite build
         env:
           VITE_API_URL: https://megakem-buildcare-backend.onrender.com
 
