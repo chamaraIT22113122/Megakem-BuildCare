@@ -8,7 +8,7 @@ export default function AdminMailTab({ token }: { token: string }) {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch('http://localhost:5001/api/admin/settings/mail', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/admin/settings/mail`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -35,7 +35,7 @@ export default function AdminMailTab({ token }: { token: string }) {
     };
 
     try {
-      const res = await fetch('http://localhost:5001/api/admin/settings/mail', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/admin/settings/mail`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(payload)

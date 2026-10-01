@@ -11,7 +11,7 @@ export default function AdminUsersTab({ token }: { token: string }) {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:5001/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/admin/users`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (res.ok) {
         setUsers(await res.json());
       }
@@ -31,7 +31,7 @@ export default function AdminUsersTab({ token }: { token: string }) {
     const formData = new FormData(e.currentTarget);
     const payload = Object.fromEntries(formData.entries());
 
-    const url = isCreating ? 'http://localhost:5001/api/admin/users' : `http://localhost:5001/api/admin/users/${editingUser._id}`;
+    const url = isCreating ? `${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/admin/users` : `${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/admin/users/${editingUser._id}`;
     const method = isCreating ? 'POST' : 'PUT';
 
     try {
@@ -57,7 +57,7 @@ export default function AdminUsersTab({ token }: { token: string }) {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/admin/users/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/admin/users/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

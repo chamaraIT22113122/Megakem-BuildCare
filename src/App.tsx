@@ -185,7 +185,7 @@ function App() {
   }, [cart]);
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/products')
+    fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/products`)
       .then(res => res.json())
       .then((data: Product[]) => {
         const sizeRegex = /\b(\d+(?:\.\d+)?\s*(?:Kg|kg|KG|g|G|Ltr|ltr|L|l|ML|ml)(?:\s*(?:Set|CAN|Can|can))?)\b/i;
@@ -407,7 +407,7 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
     };
 
     try {
-      const res = await fetch('http://localhost:5001/api/orders', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)

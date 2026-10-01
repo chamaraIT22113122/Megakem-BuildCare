@@ -82,7 +82,7 @@ export default function AdminDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:5001/api/orders', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/orders`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -109,7 +109,7 @@ export default function AdminDashboard() {
   const handleDeleteOrder = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this order entirely?')) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/orders/${id}`, { 
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/orders/${id}`, { 
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -137,7 +137,7 @@ export default function AdminDashboard() {
     };
 
     try {
-      const res = await fetch(`http://localhost:5001/api/orders/${editingOrder._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/orders/${editingOrder._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(orderData)
