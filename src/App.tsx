@@ -19,7 +19,6 @@ import l11 from './assets/logos/11.jpeg';
 import l12 from './assets/logos/12.png';
 import l13 from './assets/logos/13.png';
 
-const footerLogos = [l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13];
 import {
   AppBar,
   Toolbar,
@@ -136,6 +135,8 @@ const initialCheckoutDetails: CheckoutDetails = {
   preference: 'Collection',
   notes: ''
 };
+
+const footerLogos = [l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13];
 
 function App() {
   const [products, setProducts] = useState<GroupedProduct[]>([]);
