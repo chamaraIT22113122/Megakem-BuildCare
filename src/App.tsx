@@ -165,6 +165,7 @@ function App() {
   const [configPackSize, setConfigPackSize] = useState("");
   const [configColor, setConfigColor] = useState("");
   const [activeImage, setActiveImage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const getColorCode = (colorName: string) => {
     const name = colorName.toLowerCase();
@@ -186,83 +187,109 @@ function App() {
   }, [cart]);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL;
-    const fetchUrl = apiUrl 
-      ? `${apiUrl}/api/products` 
-      : import.meta.env.DEV 
-        ? "http://localhost:5001/api/products" 
-        : `${import.meta.env.BASE_URL}products.json`;
+    const processData = (data: Product[]) => {
+      const sizeRegex = /\b(\d+(?:\.\d+)?\s*(?:Kg|kg|KG|g|G|Ltr|ltr|L|l|ML|ml)(?:\s*(?:Set|CAN|Can|can))?)\b/i;
+      const knownColors = ['White', 'Light Grey', 'Grey', 'Black', 'Yellow', 'Clear', 'Red', 'Blue', 'Green', 'Orange'];
 
-    fetch(fetchUrl)
-      .then(res => res.json())
-      .then((data: Product[]) => {
-        const sizeRegex = /\b(\d+(?:\.\d+)?\s*(?:Kg|kg|KG|g|G|Ltr|ltr|L|l|ML|ml)(?:\s*(?:Set|CAN|Can|can))?)\b/i;
-        const knownColors = ['White', 'Light Grey', 'Grey', 'Black', 'Yellow', 'Clear', 'Red', 'Blue', 'Green', 'Orange'];
-
-        const groups: Record<string, GroupedProduct> = {};
+      const groups: Record<string, GroupedProduct> = {};
+      
+      data.forEach(product => {
+        let size = '';
+        const sm = product.name.match(sizeRegex);
+        if (sm) size = sm[1];
         
-        data.forEach(product => {
-          let size = '';
-          const sm = product.name.match(sizeRegex);
-          if (sm) size = sm[1];
-          
-          let color = 'Default';
-          for (const c of knownColors) {
-            if (new RegExp('\\b' + c + '\\b', 'i').test(product.name)) {
-              color = c;
-              break;
-            }
+        let color = 'Default';
+        for (const c of knownColors) {
+          if (new RegExp('\\b' + c + '\\b', 'i').test(product.name)) {
+            color = c;
+            break;
           }
-          
-          let base = product.name;
-          if (size) base = base.replace(sm[0], '');
-          if (color !== 'Default') base = base.replace(new RegExp('\\b' + color + '\\b', 'i'), '');
-          
-          base = base.replace(/[\-\s]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+        }
+        
+        let base = product.name;
+        if (size) base = base.replace(sm[0], '');
+        if (color !== 'Default') base = base.replace(new RegExp('\\b' + color + '\\b', 'i'), '');
+        
+        base = base.replace(/[\-\s]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
 
-          if (!groups[base]) {
-            groups[base] = {
-              id: base,
-              name: base,
-              category: product.category,
-              description: product.description,
-              images: product.imageUrl ? [product.imageUrl] : [],
-              variants: []
-            };
-          } else {
-            if (product.imageUrl && !groups[base].images.includes(product.imageUrl)) {
-              groups[base].images.push(product.imageUrl);
-            }
+        if (!groups[base]) {
+          groups[base] = {
+            id: base,
+            name: base,
+            category: product.category,
+            description: product.description,
+            images: product.imageUrl ? [product.imageUrl] : [],
+            variants: []
+          };
+        } else {
+          if (product.imageUrl && !groups[base].images.includes(product.imageUrl)) {
+            groups[base].images.push(product.imageUrl);
           }
-          
-          if (product.packSizePricing && product.packSizePricing.length > 0) {
-            product.packSizePricing.forEach(psp => {
-              groups[base].variants.push({
-                id: `${product._id}-${psp.packSize}`,
-                originalProduct: product,
-                color: color,
-                size: psp.packSize,
-                price: psp.price
-              });
-            });
-          } else {
+        }
+        
+        if (product.packSizePricing && product.packSizePricing.length > 0) {
+          product.packSizePricing.forEach(psp => {
             groups[base].variants.push({
-              id: product._id,
+              id: `${product._id}-${psp.packSize}`,
               originalProduct: product,
               color: color,
-              size: size || 'Standard',
-              price: product.price || 0
+              size: psp.packSize,
+              price: psp.price
             });
-          }
-        });
+          });
+        } else {
+          groups[base].variants.push({
+            id: product._id,
+            originalProduct: product,
+            color: color,
+            size: size || 'Standard',
+            price: product.price || 0
+          });
+        }
+      });
 
-        setProducts(Object.values(groups));
-        setLoading(false);
+      setProducts(Object.values(groups));
+      setLoading(false);
+    };
+
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const localUrl = `${import.meta.env.BASE_URL}products.json`;
+
+    // 1. Immediately load local static JSON for instant UI
+    fetch(localUrl)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          processData(data);
+        }
       })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-        setSnackbar({ open: true, message: 'Failed to load products', severity: 'error' });
+      .catch(console.error);
+
+    // 2. Silently fetch from real API to get fresh data in the background
+    const fetchUrl = apiUrl ? `${apiUrl}/api/products` : import.meta.env.DEV ? "http://localhost:5001/api/products" : localUrl;
+    
+    if (fetchUrl !== localUrl) {
+      fetch(fetchUrl)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            processData(data);
+          }
+        })
+        .catch(err => {
+          console.error('Background API fetch failed:', err);
+          // If local data also failed and loading is still true, we show error
+          setTimeout(() => {
+            setLoading(prev => {
+              if (prev) setSnackbar({ open: true, message: 'Failed to load live products', severity: 'error' });
+              return false;
+            });
+          }, 1000);
+        });
+    } else {
+       // If there's no API URL and we are not in dev, local data is all we have
+       setTimeout(() => setLoading(false), 500); 
+    }
       });
   }, []);
 
@@ -414,6 +441,7 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
       totalAmount: cartTotal
     };
 
+    setIsSubmitting(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/orders`, {
         method: 'POST',
@@ -448,6 +476,8 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
       console.error(err);
       toast.error('Network error. Falling back to email generation.');
       setShowEmail(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -994,10 +1024,10 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
                       fullWidth 
                       size="large"
                       onClick={handleSubmitOrder}
-                      disabled={!checkoutDetails.employeeName || !checkoutDetails.managerName}
+                      disabled={!checkoutDetails.employeeName || !checkoutDetails.managerName || isSubmitting}
                       sx={{ mt: 2, fontWeight: 'bold' }}
                     >
-                      SUBMIT ORDER FOR APPROVAL
+                      {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'SUBMIT ORDER FOR APPROVAL'}
                     </Button>
                   </Box>
                 </Box>
