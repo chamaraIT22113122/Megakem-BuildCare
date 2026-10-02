@@ -1203,7 +1203,7 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
       <Box sx={{ 
         background: 'linear-gradient(135deg, #001a33 0%, #000d1a 100%)', 
         color: 'white', 
-        py: { xs: 5, md: 6 },
+        py: { xs: 4, md: 4 },
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -1265,7 +1265,7 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
           </Box>
         </Container>
           
-        <Box sx={{ mt: 6, pt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', px: { xs: 2, sm: 4, xl: 8 } }}>
+        <Box sx={{ mt: 4, pt: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', px: { xs: 2, sm: 4, xl: 8 } }}>
           <Box sx={{ 
             display: 'flex', 
             flexWrap: 'nowrap', 
@@ -1281,8 +1281,8 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
                   key={idx}
                   sx={{
                     bgcolor: 'white',
-                    borderRadius: 3,
-                    p: { xs: 0.5, sm: 1.5, md: 2 },
+                    borderRadius: 2,
+                    p: { xs: 0.5, sm: 1, md: 1 },
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -1302,7 +1302,7 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
                     src={logo} 
                     alt={`Brand Logo ${idx + 1}`} 
                     sx={{ 
-                      height: { xs: 30, sm: 50, md: 70 }, 
+                      height: { xs: 25, sm: 40, md: 50 }, 
                       width: '100%',
                       objectFit: 'contain', 
                     }} 
@@ -1313,7 +1313,7 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
           </Box>
 
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box sx={{ mt: 5, pt: 2.5, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+          <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>
               © {new Date().getFullYear()} Megakem Engineering (Pvt) Ltd. All rights reserved.
             </Typography>
