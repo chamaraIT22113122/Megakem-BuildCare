@@ -1265,7 +1265,52 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
           </Box>
         </Container>
           
-
+        <Box sx={{ mt: 6, pt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', px: { xs: 2, sm: 4, xl: 8 } }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexWrap: 'nowrap', 
+            justifyContent: 'space-between',
+            alignItems: 'center', 
+            gap: { xs: 1, sm: 2, md: 2.5 }, 
+            width: '100%',
+            overflow: 'visible',
+            py: 2
+          }}>
+              {footerLogos.map((logo, idx) => (
+                <Box 
+                  key={idx}
+                  sx={{
+                    bgcolor: 'white',
+                    borderRadius: 3,
+                    p: { xs: 0.5, sm: 1.5, md: 2 },
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    maxWidth: `calc(100% / 13)`,
+                    flex: 1,
+                    transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                    position: 'relative',
+                    '&:hover': { 
+                      transform: 'translateY(-6px) scale(1.05)',
+                      boxShadow: '0 12px 24px rgba(0,0,0,0.5)',
+                      zIndex: 10
+                    }
+                  }}
+                >
+                  <Box 
+                    component="img" 
+                    src={logo} 
+                    alt={`Brand Logo ${idx + 1}`} 
+                    sx={{ 
+                      height: { xs: 30, sm: 50, md: 70 }, 
+                      width: '100%',
+                      objectFit: 'contain', 
+                    }} 
+                  />
+                </Box>
+              ))}
+            </Box>
+          </Box>
 
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <Box sx={{ mt: 5, pt: 2.5, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
