@@ -186,7 +186,14 @@ function App() {
   }, [cart]);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/products`)
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const fetchUrl = apiUrl 
+      ? `${apiUrl}/api/products` 
+      : import.meta.env.DEV 
+        ? "http://localhost:5001/api/products" 
+        : `${import.meta.env.BASE_URL}products.json`;
+
+    fetch(fetchUrl)
       .then(res => res.json())
       .then((data: Product[]) => {
         const sizeRegex = /\b(\d+(?:\.\d+)?\s*(?:Kg|kg|KG|g|G|Ltr|ltr|L|l|ML|ml)(?:\s*(?:Set|CAN|Can|can))?)\b/i;
