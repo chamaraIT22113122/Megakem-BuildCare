@@ -165,7 +165,6 @@ function App() {
   const [configPackSize, setConfigPackSize] = useState("");
   const [configColor, setConfigColor] = useState("");
   const [activeImage, setActiveImage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const getColorCode = (colorName: string) => {
     const name = colorName.toLowerCase();
@@ -290,7 +289,6 @@ function App() {
        // If there's no API URL and we are not in dev, local data is all we have
        setTimeout(() => setLoading(false), 500); 
     }
-      });
   }, []);
 
   const productCategories = useMemo(() => {
@@ -441,44 +439,31 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
       totalAmount: cartTotal
     };
 
-    setIsSubmitting(true);
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
-      
-      if (res.ok) {
-        toast.success('Order submitted successfully for HR approval!');
-        
-        // Redirect to mailto link to open Outlook
-        const mailtoLink = `mailto:?cc=udaryahampath@wardena.com&subject=${encodeURIComponent(`Employee Order Approval Request - ${checkoutDetails.employeeName || 'Employee'}`)}&body=${encodeURIComponent(generateEmailBody())}`;
-        window.location.href = mailtoLink;
+    // 1. Immediately generate email and open Outlook
+    const mailtoLink = `mailto:?cc=udaryahampath@wardena.com&subject=${encodeURIComponent(`Employee Order Approval Request - ${checkoutDetails.employeeName || 'Employee'}`)}&body=${encodeURIComponent(generateEmailBody())}`;
+    window.location.href = mailtoLink;
 
-        setCart([]);
-        setCheckoutDetails({
-          employeeName: '',
-          employeeId: '',
-          company: '',
-          department: '',
-          designation: '',
-          contactNumber: '',
-          emailAddress: '',
-          managerName: ''
-        });
-        setIsCartOpen(false);
-      } else {
-        toast.error('Failed to submit order. Please try again.');
-        setShowEmail(true); // Fallback to email if API fails
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('Network error. Falling back to email generation.');
-      setShowEmail(true);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // 2. Instantly clear form and close cart for snappy UI
+    setCart([]);
+    setCheckoutDetails({
+      employeeName: '',
+      employeeId: '',
+      company: '',
+      department: '',
+      designation: '',
+      contactNumber: '',
+      emailAddress: '',
+      managerName: ''
+    });
+    setIsCartOpen(false);
+    toast.success('Order email drafted! Saving to database in background...');
+
+    // 3. Fire-and-forget background API request (does not block user)
+    fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    }).catch(err => console.error('Background order save failed:', err));
   };
 
   const handleCopyEmail = () => {
@@ -1024,10 +1009,10 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
                       fullWidth 
                       size="large"
                       onClick={handleSubmitOrder}
-                      disabled={!checkoutDetails.employeeName || !checkoutDetails.managerName || isSubmitting}
+                      disabled={!checkoutDetails.employeeName || !checkoutDetails.managerName}
                       sx={{ mt: 2, fontWeight: 'bold' }}
                     >
-                      {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'SUBMIT ORDER FOR APPROVAL'}
+                      SUBMIT ORDER FOR APPROVAL
                     </Button>
                   </Box>
                 </Box>
