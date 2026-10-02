@@ -1631,7 +1631,11 @@ ${checkoutDetails.employeeName || '[Employee Name]'}`;
           bottom: 12, 
           right: 32, 
           zIndex: 1000, 
-          color: 'rgba(0,0,0,0.25)', 
+          color: 'white',
+          mixBlendMode: 'difference',
+          filter: 'grayscale(100%)',
+          opacity: 0.5,
+          fontSize: '0.65rem',
           fontWeight: '500',
           letterSpacing: 0.5,
           pointerEvents: 'none'
